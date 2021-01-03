@@ -18,7 +18,7 @@ namespace DS
         /*********************************/
         /*        Private Section        */
         /*********************************/
-        std::shared_ptr<RANK> rankUpdate;
+        RANK rankUpdate;
 
         /*   Class Private Methods   */
         // General right and left rotations for balanced trees, return the new root of the tree.

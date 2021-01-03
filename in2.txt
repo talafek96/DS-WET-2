@@ -1,0 +1,16 @@
+Init
+AddCourse 234218
+AddCourse 234247
+AddClass 234218
+AddClass 234218
+AddClass 234247
+AddClass 234123
+WatchClass 234218 1 10
+TimeViewed 234218 1
+WatchClass 234247 0 20
+TimeViewed 234247 0
+GetIthWatchedClass 0
+GetIthWatchedClass 1
+GetIthWatchedClass 3
+GetIthWatchedClass 2
+Quit

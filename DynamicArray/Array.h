@@ -13,13 +13,13 @@ namespace DS
         int max_size;
     public:
         /*********************************/
-        /*        Public Section        */
+        /*         Public Section        */
         /*********************************/
         /*
          * Constructor: Array<T>
          * Usage: Array<T> new_array(size);
          * ---------------------------------
-         * Initializes a new Array that stores objects of type <T>.
+         * Initializes a new empty Array that stores objects of type <T>.
          * The default constructor creates an empty Array.
          * The second form creates and allocates an array with size elements.
          * The max size of the array is constant and cannot be realloced.
@@ -53,6 +53,7 @@ namespace DS
                 delete[] new_data;
                 throw;
             }
+            delete[] data;
             data = new_data;
         }
         

@@ -16,7 +16,7 @@ namespace DS
         int max_size; // Size of the current array
         VAL_TYPE default_val;
 
-        static int REALLOC_FACTOR = 2;
+        int realloc_factor = 2;
 
         /***********************************/
         /*        Protected Section        */
@@ -44,13 +44,14 @@ namespace DS
          * The max size of the elements in the array is dynamic and will be
          * reallocated automatically when the array fills up.
          * DO NOT INITIALIZE TO SIZE 0.
+         * REALLOC_FACTOR HAS TO BE >= 1!
          * 
          * Possible exceptions:
          * std::bad_alloc
          */
-        explicit DynamicArray(int max_size, VAL_TYPE default_val = VAL_TYPE()) : 
+        explicit DynamicArray(int max_size, VAL_TYPE default_val = VAL_TYPE(), int realloc_factor = 2) : 
         values(Array<VAL_TYPE>(max_size)), B(Array<int>(max_size)), index_stack(Array<int>(max_size)),
-        top(0), initialized(0), max_size(max_size), default_val(default_val) { }
+        top(0), initialized(0), max_size(max_size), default_val(default_val), realloc_factor(realloc_factor) { }
         /*
          * Copy Constructor: DynamicArray<T>
          * Usage: DynamicArray<T> new_array = arr;
@@ -133,7 +134,7 @@ namespace DS
             values[i] = val;
             
             // Check to see if the array is now full:
-            if(initialized >= max_size)
+            if(realloc_factor > 1 && initialized >= max_size)
             {
                 expandArray();
             }
@@ -168,7 +169,7 @@ namespace DS
             return initialized;
         }
 
-        void expandArray(int factor = REALLOC_FACTOR)
+        void expandArray(int factor = realloc_factor)
         {
             int new_size = max_size*factor;
             DynamicArray<VAL_TYPE> new_array(new_size);

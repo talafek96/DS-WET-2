@@ -440,7 +440,7 @@ namespace DS
             rightmost_node = findHighestNode(tree_root);
         }
 
-        AVL& operator=(const AVL<KEY_TYPE, VAL_TYPE,NODE>& other) //FIXME: Miserable copy constructor
+        AVL& operator=(const AVL<KEY_TYPE, VAL_TYPE,NODE>& other)
         {
             deleteTree(tree_root);
 

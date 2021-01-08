@@ -6,7 +6,7 @@
 
 namespace DS
 {
-    enum SEARCH_PATH
+    enum class SEARCH_PATH
     {
         Left, Right, End
     };
@@ -359,9 +359,9 @@ namespace DS
             }
             while(node->key != key)
             {
-                calc_functor(node);
                 if(key > node->key)
                 {
+                    calc_functor(node, SEARCH_PATH::Right);
                     if(node->right == nullptr)
                     {
                         return false;
@@ -371,6 +371,7 @@ namespace DS
                 }
                 else if(key < node->key)
                 {
+                    calc_functor(node, SEARCH_PATH::Left);
                     if(node->left == nullptr)
                     {
                         return false;
@@ -380,7 +381,7 @@ namespace DS
                 }
             }
             // If we reached this point, node now points to the correct address.
-            calc_functor(node);
+            calc_functor(node, SEARCH_PATH::End);
             return true;
         }
     };

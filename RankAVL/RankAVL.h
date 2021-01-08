@@ -24,7 +24,7 @@ namespace DS
         // General right and left rotations for balanced trees, return the new root of the tree.
         std::shared_ptr<NODE> rotateRight(std::shared_ptr<NODE>& sub_root) override
         {
-            std::shared_ptr<NODE> father = sub_root->father;
+            std::weak_ptr<NODE> father = sub_root->father;
             std::shared_ptr<NODE> L_sub = sub_root->left;
             std::shared_ptr<NODE> LR_sub = L_sub->right;
 
@@ -41,6 +41,10 @@ namespace DS
             // Update the new heights:
             sub_root->height = max(height(sub_root->left), height(sub_root->right)) + 1;
             L_sub->height = max(height(L_sub->left), height(L_sub->right)) + 1;
+
+            // Update ranks:
+            rankUpdate(sub_root);
+            rankUpdate(L_sub);
 
             // Return the new sub root
             return L_sub;
@@ -67,6 +71,10 @@ namespace DS
             sub_root->height = max(height(sub_root->left), height(sub_root->right)) + 1;
             R_sub->height = max(height(R_sub->left), height(R_sub->right)) + 1;
 
+            // Update ranks:
+            rankUpdate(sub_root);
+            rankUpdate(R_sub);
+
             // Return the new sub root
             return R_sub;
         }
@@ -81,6 +89,8 @@ namespace DS
                 {
                     root->left = newNode(key, val, root);
                     root->height = max(height(root->left), height(root->right)) + 1;
+                    rankUpdate(root->left); // Update ranks
+                    rankUpdate(root);
                     node_count++;
                     return root;
                 }
@@ -92,6 +102,8 @@ namespace DS
                 {
                     root->right = newNode(key, val, root);
                     root->height = max(height(root->left), height(root->right)) + 1;
+                    rankUpdate(root->right); // Update ranks
+                    rankUpdate(root);
                     node_count++;
                     return root;
                 }
@@ -103,8 +115,9 @@ namespace DS
                 return root;
             }
 
-            // 2. Update the height of all the nodes in the BST search.
+            // 2. Update the height and ranks of all the nodes in the BST search.
             root->height = max(height(root->left), height(root->right)) + 1;
+            rankUpdate(root);
 
             // 3. Verify balance factors, and perform rotations if needed.
             int balance_fact = getBalance(root);
@@ -202,8 +215,9 @@ namespace DS
             {
                 return root;
             }
-            // Update heights:
+            // Update heights and ranks:
             root->height = max(height(root->right), height(root->left)) + 1;
+            rankUpdate(root);
             // Confirm balance factors:
             int balance_fact = getBalance(root);
             // If the node is unbalanced then we need two rotations according to the 4 cases:
@@ -272,6 +286,7 @@ namespace DS
             if(tree_root == nullptr)
             {
                 tree_root = newNode(key, val);
+                updateRank(tree_root); // Update rank
                 leftmost_node = rightmost_node = tree_root;
                 node_count++;
                 return;
@@ -329,17 +344,45 @@ namespace DS
          * the user to calculate the rank of the corresponding key.
          * Checks if the key exists in the tree.
          * If the key was found, return true.
-         * Otherwise, the rank calculated will match all keys that are lower than
-         * the provided key using the calc_functor, and return false.
+         * Otherwise, the rank calculated will match all keys that are less significant
+         * than the provided key using the calc_functor, and return false.
          * When n is the total number of keys in the tree, the
          * worst time and space complexity for this method is O(log n).
          */
         template<class FUNCTOR>
         bool rank(const KEY_TYPE& key, FUNCTOR calc_functor) const
         {
-
+            std::shared_ptr<NODE> node = tree_root;
+            if(!node)
+            {
+                return false;
+            }
+            while(node->key != key)
+            {
+                calc_functor(node);
+                if(key > node->key)
+                {
+                    if(node->right == nullptr)
+                    {
+                        return false;
+                    }
+                    node = node->right;
+                    continue;
+                }
+                else if(key < node->key)
+                {
+                    if(node->left == nullptr)
+                    {
+                        return false;
+                    }
+                    node = node->left;
+                    continue;
+                }
+            }
+            // If we reached this point, node now points to the correct address.
+            calc_functor(node);
+            return true;
         }
-        
     };
 }
 #endif

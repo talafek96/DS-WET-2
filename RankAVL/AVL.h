@@ -2,6 +2,7 @@
 #define _AVL_T
 #include <memory>
 #include <assert.h>
+#include "../Exceptions/Exceptions.h"
 
 namespace DS
 {
@@ -12,7 +13,7 @@ namespace DS
         KEY_TYPE key;
         VAL_TYPE val;
         int height = 0;
-        std::weak_ptr<graph_node<KEY_TYPE, VAL_TYPE>> father;
+        std::shared_ptr<graph_node<KEY_TYPE, VAL_TYPE>> father;
         std::shared_ptr<graph_node<KEY_TYPE, VAL_TYPE>> left;
         std::shared_ptr<graph_node<KEY_TYPE, VAL_TYPE>> right;
         virtual ~graph_node() = default;
@@ -51,7 +52,7 @@ namespace DS
         }
 
         // Helper function that allocates and returns a shared pointer to a new node for the tree.
-        static std::shared_ptr<NODE> newNode(const KEY_TYPE& key, const VAL_TYPE& val, const std::weak_ptr<NODE>& father = nullptr)
+        static std::shared_ptr<NODE> newNode(const KEY_TYPE& key, const VAL_TYPE& val, const std::shared_ptr<NODE>& father = nullptr)
         {
             std::shared_ptr<NODE> node = std::make_shared<NODE>();
             node->key = key;
@@ -73,11 +74,25 @@ namespace DS
             return height(node->left) - height(node->right);
         }
 
+        // Deepcopy src tree into dest tree
+        static void deepcopy(std::shared_ptr<NODE>& dest, const std::shared_ptr<NODE>& src)
+        {
+            if(src == nullptr)
+            {
+                return;
+            }
+            // newNode(const KEY_TYPE& key, const VAL_TYPE& val, const std::shared_ptr<NODE>& father = nullptr)
+            dest = newNode(src->key, src->val, src->father);
+            *dest = *src;
+            deepcopy(dest->left, src->left);
+            deepcopy(dest->right, src->right);
+        }
+
         /*   Class Private Methods   */
         // General right and left rotations for balanced trees, return the new root of the tree.
         std::shared_ptr<NODE> rotateRight(std::shared_ptr<NODE>& sub_root)
         {
-            std::weak_ptr<NODE> father = sub_root->father;
+            std::shared_ptr<NODE> father = sub_root->father;
             std::shared_ptr<NODE> L_sub = sub_root->left;
             std::shared_ptr<NODE> LR_sub = L_sub->right;
 
@@ -102,7 +117,7 @@ namespace DS
 
         std::shared_ptr<NODE> rotateLeft(std::shared_ptr<NODE>& sub_root)
         {
-            std::weak_ptr<NODE> father = sub_root->father;
+            std::shared_ptr<NODE> father = sub_root->father;
             std::shared_ptr<NODE> R_sub = sub_root->right;
             std::shared_ptr<NODE> RL_sub = R_sub->left;
 
@@ -264,7 +279,7 @@ namespace DS
                     // Backup the pointers of root before we override them
                     std::shared_ptr<NODE> rootOldLeftChild = root->left;
                     std::shared_ptr<NODE> rootOldRightChild = root->right;
-                    std::weak_ptr<NODE> rootOldFather = root->father;
+                    std::shared_ptr<NODE> rootOldFather = root->father;
                     *(root) = *(nextMin); // Overwrite root with his replacement
                     root->left = rootOldLeftChild; // Restore the original pointers
                     root->father = rootOldFather;
@@ -322,6 +337,7 @@ namespace DS
         }
 
         // An auxiliary function for inOrder.
+        // The functor must decrease k for the number of nodes it has taken care of
         template<class FUNCTOR>
         void inOrderAux(const std::shared_ptr<NODE>& p, int* k, FUNCTOR& func) const
         {
@@ -416,8 +432,35 @@ namespace DS
         tree_root(std::make_shared<NODE>(root)), leftmost_node(root), rightmost_node(root), node_count(1) { }
         explicit AVL() : tree_root(nullptr), leftmost_node(nullptr), rightmost_node(nullptr), node_count(0) { }
 
-        AVL(const AVL<KEY_TYPE, VAL_TYPE,NODE>& other) = delete;
-        AVL& operator=(const AVL& other) = delete;
+        AVL(const AVL<KEY_TYPE, VAL_TYPE,NODE>& other) :
+        tree_root(std::make_shared<NODE>()), leftmost_node(nullptr), rightmost_node(nullptr), node_count(other.node_count)
+        {
+            deepcopy(tree_root, other.tree_root);
+            leftmost_node = findLowestNode(tree_root);
+            rightmost_node = findHighestNode(tree_root);
+        }
+
+        AVL& operator=(const AVL<KEY_TYPE, VAL_TYPE,NODE>& other) //FIXME: Miserable copy constructor
+        {
+            deleteTree(tree_root);
+
+            class CopyTree
+            {
+            public:
+                AVL<KEY_TYPE,VAL_TYPE,NODE>* this_tree;
+                CopyTree(AVL<KEY_TYPE, VAL_TYPE, NODE>* tree) : this_tree(tree) { }
+                void operator()(const std::shared_ptr<graph_node<KEY_TYPE, VAL_TYPE>>& node, int* k)
+                {
+                    this_tree->insert(node->key, node->val);
+                    (*k)--;
+                }
+            };
+
+            CopyTree functor(this);
+            other.inOrder(functor);
+            return *this;
+        }
+
         virtual ~AVL()
         {
             deleteTree(tree_root);
@@ -706,12 +749,20 @@ namespace DS
         const std::shared_ptr<NODE>& getHighest() const
         {
             return rightmost_node;
-        } 
+        }
 
-        /******************/
-        /****EXCEPTIONS****/
-        /******************/
-        class KeyNotFound { };
+        /*
+         * Method: size
+         * Usage: tree.size();
+         * -----------------------------------
+         * Returns the number of nodes in the tree,
+         * 
+         * The worst time and space complexity for this method is O(1).
+         */
+        int size() const
+        {
+            return node_count;
+        }
     };
 }
 #endif

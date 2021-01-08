@@ -3,6 +3,7 @@
 #include <memory>
 #include <assert.h>
 #include "AVL.h"
+#include "../Exceptions/Exceptions.h"
 
 namespace DS
 {
@@ -24,7 +25,7 @@ namespace DS
         // General right and left rotations for balanced trees, return the new root of the tree.
         std::shared_ptr<NODE> rotateRight(std::shared_ptr<NODE>& sub_root) override
         {
-            std::weak_ptr<NODE> father = sub_root->father;
+            std::shared_ptr<NODE> father = sub_root->father;
             std::shared_ptr<NODE> L_sub = sub_root->left;
             std::shared_ptr<NODE> LR_sub = L_sub->right;
 
@@ -201,7 +202,7 @@ namespace DS
                     // Backup the pointers of root before we override them
                     std::shared_ptr<NODE> rootOldLeftChild = root->left;
                     std::shared_ptr<NODE> rootOldRightChild = root->right;
-                    std::weak_ptr<NODE> rootOldFather = root->father;
+                    std::shared_ptr<NODE> rootOldFather = root->father;
                     *(root) = *(nextMin); // Overwrite root with his replacement
                     root->left = rootOldLeftChild; // Restore the original pointers
                     root->father = rootOldFather;
@@ -253,7 +254,7 @@ namespace DS
         /*         Public Section         */
         /**********************************/
         /*
-         * Constructor: AVL
+         * Constructor: RankAVL
          * Usage: RankAVL<RANK, KEY_TYPE, VAL_TYPE, NODE> tree(root, rankUpdate);
          *        RankAVL<RANK, KEY_TYPE, VAL_TYPE, NODE> tree(rankUpdate);
          * ---------------------------------------

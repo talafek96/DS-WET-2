@@ -1,6 +1,7 @@
 #ifndef _DYNAMIC_ARRAY_H
 #define _DYNAMIC_ARRAY_H
-#include <Array.h>
+#include "Array.h"
+#include "../Exceptions/Exceptions.h"
 
 namespace DS
 {
@@ -12,7 +13,7 @@ namespace DS
         Array<int> B;
         Array<int> index_stack;
         int top = 0; // The next index_stack index to write into
-        int initialized; // Number of initialized elements
+        int num_initialized; // Number of initialized elements
         int max_size; // Size of the current array
         VAL_TYPE default_val;
 
@@ -36,7 +37,7 @@ namespace DS
          * Constructor: DynamicArray<T>
          * Usage: DynamicArray<T> new_array(size, default_val);
          *        DynamicArray<T> new_array(size);
-         * ---------------------------------
+         * -----------------------------------
          * Initializes a new empty Array that stores objects of type <T>.
          * Creates and allocates an array with size elements.
          * Creating a dynamic array without stating the default val will default
@@ -51,32 +52,32 @@ namespace DS
          */
         explicit DynamicArray(int max_size, VAL_TYPE default_val = VAL_TYPE(), int realloc_factor = 2) : 
         values(Array<VAL_TYPE>(max_size)), B(Array<int>(max_size)), index_stack(Array<int>(max_size)),
-        top(0), initialized(0), max_size(max_size), default_val(default_val), realloc_factor(realloc_factor) { }
+        top(0), num_initialized(0), max_size(max_size), default_val(default_val), realloc_factor(realloc_factor) { }
         /*
          * Copy Constructor: DynamicArray<T>
          * Usage: DynamicArray<T> new_array = arr;
-         * --------------------------------
+         * -----------------------------------
          * Creates a new array that is a copy of other.
          * 
          * Possible exceptions:
          * No assignment operator to class T, std::bad_aloc
          */
         DynamicArray(const DynamicArray& other) = default;
-        virtual ~DynamicArray();
+        virtual ~DynamicArray() = default;
         /*
          * Operator: =
          * Usage: this_array = target_arr;
-         * --------------------------------
+         * -----------------------------------
          * Replaces every single element in the left hand array to be equal
          * to target_arr's elements.
          * 
          * Possible exceptions:
          * No assignment operator to class T, std::bad_aloc
          */
-        DynamicArray& operator=(const Array& target_arr) = default;
+        DynamicArray& operator=(const DynamicArray& target_arr) = default;
 
         // Return a bool value to determine whether the dynamic array at index i is initialized.
-        bool is_initialized(int i) noexcept
+        bool isInitialized(int i) const noexcept
         {
             return ((i < max_size) && (B[i] < top) && (B[i] >= 0) && (index_stack[B[i]] == i));
         }
@@ -84,10 +85,10 @@ namespace DS
         /*
          * Method: get
          * Usage: array.get(i);
-         * --------------------------------
+         * -----------------------------------
          * Returns the element in the cell i of the array.
          * Can only access elements in range of size(), otherwise
-         * throws and exception.
+         * throws an exception.
          * 
          * Possible exceptions:
          * OutOfBounds
@@ -98,7 +99,20 @@ namespace DS
             {
                 throw OutOfBounds();
             }
-            if(is_initialized(i))
+            if(isInitialized(i))
+            {
+                return values[i];
+            }
+            return default_val;
+        }
+
+        VAL_TYPE& get(int i)
+        {
+            if(i >= max_size)
+            {
+                throw OutOfBounds();
+            }
+            if(isInitialized(i))
             {
                 return values[i];
             }
@@ -108,7 +122,7 @@ namespace DS
         /*
          * Method: store
          * Usage: array.store(i, val);
-         * --------------------------------
+         * -----------------------------------
          * Stores the value 'val' in the cell i of the array.
          * Can only access elements in range of size(), otherwise
          * throws and exception.
@@ -124,17 +138,17 @@ namespace DS
             {
                 throw OutOfBounds();
             }
-            if(!is_initialized(i))
+            if(!isInitialized(i))
             {
                 index_stack[top] = i;
                 B[i] = top;
                 top++;
-                initialized++;
+                num_initialized++;
             }
             values[i] = val;
             
             // Check to see if the array is now full:
-            if(realloc_factor > 1 && initialized >= max_size)
+            if(realloc_factor > 1 && num_initialized >= max_size)
             {
                 expandArray();
             }
@@ -143,13 +157,13 @@ namespace DS
         /*
          * Method: size
          * Usage: array.size();
-         * --------------------------------
+         * -----------------------------------
          * Returns the current max size of the array.
          * 
          * Possible exceptions:
          * No exception.
          */
-        int size() noexcept
+        int size() const noexcept
         {
             return max_size;
         }
@@ -157,7 +171,7 @@ namespace DS
         /*
          * Method: initialized
          * Usage: array.initialized();
-         * --------------------------------
+         * -----------------------------------
          * Returns the current number of initialized cells
          * in the array.
          * 
@@ -166,28 +180,23 @@ namespace DS
          */
         int initialized() noexcept
         {
-            return initialized;
+            return num_initialized;
         }
 
-        void expandArray(int factor = realloc_factor)
+        void expandArray(int factor = -1)
         {
+            if (factor == -1)
+            {
+                factor = realloc_factor;
+            }
             int new_size = max_size*factor;
             DynamicArray<VAL_TYPE> new_array(new_size);
-            for(i = 0; i < max_size; i++)
+            for(int i = 0; i < max_size; i++)
             {
                 new_array.store(i, get(i));
             }
             *this = new_array;
         }
-
-        /***********************************/
-        /*        Exception Section        */
-        /***********************************/
-        class Exception 
-        {  
-            virtual ~Exception();
-        }
-        class OutOfBounds : public Exception { };
     };
 }
 

@@ -184,3 +184,7 @@ build/compile_commands.json
 build/CMakeCache.txt
 build/cmake_install.cmake
 build/.cmake/api/v1/reply/index-2021-01-09T12-05-41-0085.json
+build/output.txt
+build/.cmake/api/v1/reply/codemodel-v2-d10506f0f14321eac86e.json
+build/.cmake/api/v1/reply/index-2021-01-09T21-59-11-0108.json
+build/.cmake/api/v1/reply/target-boom-Debug-f237b2fbd9a5b34b72df.json

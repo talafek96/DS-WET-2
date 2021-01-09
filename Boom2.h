@@ -1,7 +1,10 @@
 #ifndef _BOOM_H
 #define _BOOM_H
-// #include "avl_tree/AVL.h"
-// #include "Array/Array.h" //TODO: Update includes
+#include "RankAVL/AVL.h"
+#include "RankAVL/RankAVL.h"
+#include "DynamicArray/DynamicArray.h"
+#include "ChainTable/ChainTable.h"
+
 
 namespace DS
 {
@@ -64,27 +67,49 @@ namespace DS
         }
     };
 
-    class Boom
+    class Boom2
     {
     private:
-        class SubtreeSize //TODO: Make the rank update functor
-        {
 
+        class lectures
+        {
+        public:
+            DynamicArray<LectureContainer> array;
+            int top = 0;
+
+            lectures() : array(DynamicArray<LectureContainer>(10, {0, 0, 0}, 2)), top(0) { }
         };
 
-        ChainTable<int, DynamicArray<LectureContainer>> course_tree;
-        RankAVL<SubtreeSize, LectureContainer,int> lecture_tree;
+        class SubtreeSize
+        {
+        public:
+            void operator()(std::shared_ptr<graph_node<LectureContainer, int>>& node)
+            {
+                if(!node)
+                {
+                    return;
+                }
+                int left_size = node->left? node->left->val : 0;
+                int right_size = node->right? node->right->val : 0;
+                node->val = left_size + right_size + 1;
+            }
+        };
+
+        ChainTable<lectures> course_table;
+        RankAVL<SubtreeSize, LectureContainer, int> lecture_tree;
         int lecture_counter = 0;
 
     public:
-        Boom() = default;
-        ~Boom() = default;
+        // TODO: Make a constructor
+        Boom2();
+        ~Boom2() = default;
 
-        bool addCourse(int course_id, int numOfClasses);
-        bool getMostViewedClasses(int numOfClasses, int *courses, int *classes);
+        bool addCourse(int course_id);
         bool removeCourse(int course_id);
+        bool addClass(int course_id, int* class_id);
         bool watchClass(int course_id, int class_id, int time);
-        bool timeViewed(int course_id, int class_id, int *time_viewed);
+        bool timeViewed(int course_id, int class_id, int* time_viewed);
+        bool getIthWatchedClass(int i, int* course_id, int* class_id);
 
         class InvalidInput { };
     };

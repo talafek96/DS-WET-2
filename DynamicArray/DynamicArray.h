@@ -193,7 +193,7 @@ namespace DS
                 factor = realloc_factor;
             }
             int new_size = max_size*factor;
-            DynamicArray<VAL_TYPE> new_array(new_size);
+            DynamicArray<VAL_TYPE> new_array(new_size, VAL_TYPE(), realloc_factor);
             for(int i = 0; i < max_size; i++)
             {
                 new_array.store(i, get(i));

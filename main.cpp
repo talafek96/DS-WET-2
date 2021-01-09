@@ -4,40 +4,17 @@ int main()
 {
     using namespace DS;
     ChainTable<int> table;
-    // table.insert(0, 0);
-    // table.insert(1, 1);
-    // table.insert(2, 2);
-    // table.insert(3, 3);
-    // table.insert(4, 4);
-    // table.insert(5, 5);
-    // table.insert(6, 6);
-    // table.insert(7, 7);
-    // table.insert(8, 8);
-    // table.insert(9, 9);
-    // table.insert(10, 10);
 
-    // std::cout << table.get(0) << std::endl;
-    // std::cout << table.get(1) << std::endl;
-    // std::cout << table.get(2) << std::endl;
-    // std::cout << table.get(3) << std::endl;
-    // std::cout << table.get(4) << std::endl;
-    // std::cout << table.get(5) << std::endl;
-    // std::cout << table.get(6) << std::endl;
-    // std::cout << table.get(7) << std::endl;
-    // std::cout << table.get(8) << std::endl;
-    // std::cout << table.get(9) << std::endl;
-    // std::cout << table.get(10) << std::endl;
-    
-    for(int i = 0; i < 100000; i++)
+    for(int i = 0; i < 10000; i++)
     {
         table.insert(i, 10*i);
     }
-    std::cout << "The inserted elements are: " << std::endl;
-    for(int i = 0; i < 100000; i++)
+    for(int i = 0; i < 9500; i++)
     {
-        std::cout << "(" << i << ", " << table.get(i) << ")\n";
+        table.erase(i);
     }
-    table.erase(1);
-    std::cout << table.find(1) << std::endl;
+    int a = 50;
+    std::cout << "The key " << a << " is " << (table.find(a)? "" : "not ") << "in the table." << std::endl;
+    std::cout << "The size of the table is: " << table.tableSize() << ".\n";
     return 0;
 }

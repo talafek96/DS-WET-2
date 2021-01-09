@@ -20,9 +20,8 @@ namespace DS
         double ratio; // Hash function parameter (golden ratio)
 
         /*   Private Static Variables   */
-        static const int STRESS_CONTROL = 1; // elem_counter/size = alpha < STRESS_CONTROL
+        static const int STRESS_CONTROL = 2; // elem_counter/size = alpha < STRESS_CONTROL
         static const int INIT_SIZE = 10; // Initial table size
-        
         /*   Private Methods/Static Functions   */
         // Gets a key as input and returns the matching index
         int hash(double key) const
@@ -83,10 +82,12 @@ namespace DS
             int table_size = table.size();
             double stress_factor = static_cast<double>(elem_counter)/table_size;
             bool res = true;
-            if(stress_factor >= STRESS_CONTROL || ((stress_factor < (1/(4*STRESS_CONTROL))) && already_expanded) )
+            if((stress_factor >= STRESS_CONTROL) ||
+            ((table_size > INIT_SIZE) && already_expanded && (stress_factor < (static_cast<double>(STRESS_CONTROL)/4))))
             {
-                double k = 2*static_cast<double>(elem_counter)/table_size; // The constant to multiply the current table size with to reach 1/2 stress fact.
-                res = remakeTable(floor(table_size * k));
+                // The constant to multiply the current table size with to normalize the stress factor to (1/2)*STRESS_CONTROL:
+                double k = (2*static_cast<double>(elem_counter))/(STRESS_CONTROL*table_size);
+                res = remakeTable(ceil(static_cast<double>(table_size) * k));
             }
             return res;
         }
@@ -233,6 +234,11 @@ namespace DS
         int size() const
         {
             return elem_counter;
+        }
+
+        int tableSize() const
+        {
+            return table.size();
         }
     };
 }

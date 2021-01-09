@@ -17,7 +17,7 @@ namespace DS
         int max_size; // Size of the current array
         VAL_TYPE default_val;
 
-        int realloc_factor = 2;
+        int realloc_factor;
 
         /***********************************/
         /*        Protected Section        */
@@ -50,9 +50,9 @@ namespace DS
          * Possible exceptions:
          * std::bad_alloc
          */
-        explicit DynamicArray(int max_size, VAL_TYPE default_val = VAL_TYPE(), int realloc_factor = 2) : 
+        explicit DynamicArray(int max_size, VAL_TYPE default_val = VAL_TYPE(), int re_fact = 1) : 
         values(Array<VAL_TYPE>(max_size)), B(Array<int>(max_size)), index_stack(Array<int>(max_size)),
-        top(0), num_initialized(0), max_size(max_size), default_val(default_val), realloc_factor(realloc_factor) { }
+        top(0), num_initialized(0), max_size(max_size), default_val(default_val), realloc_factor(re_fact) { }
         /*
          * Copy Constructor: DynamicArray<T>
          * Usage: DynamicArray<T> new_array = arr;
@@ -62,7 +62,10 @@ namespace DS
          * Possible exceptions:
          * No assignment operator to class T, std::bad_aloc
          */
-        DynamicArray(const DynamicArray& other) = default;
+        DynamicArray(const DynamicArray& other) :
+        values(other.values), B(other.B), index_stack(other.index_stack), top(other.top), num_initialized(other.num_initialized),
+        max_size(other.max_size), default_val(other.default_val), realloc_factor(other.realloc_factor) { }
+
         virtual ~DynamicArray() = default;
         /*
          * Operator: =

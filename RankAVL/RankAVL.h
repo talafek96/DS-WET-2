@@ -7,9 +7,9 @@
 
 namespace DS
 {
-    enum class SEARCH_PATH
+    enum class SearchPath
     {
-        Left, Right, End
+        start, left, right, parent, end
     };
 
     template<typename RANK, typename KEY_TYPE=int, typename VAL_TYPE=int, class NODE=graph_node<KEY_TYPE, VAL_TYPE>> 
@@ -351,39 +351,15 @@ namespace DS
          * worst time and space complexity for this method is O(log n).
          */
         template<class FUNCTOR>
-        bool rank(const KEY_TYPE& key, FUNCTOR calc_functor) const
+        std::shared_ptr<NODE>& rank(FUNCTOR calc_functor)
         {
-            std::shared_ptr<NODE> node = tree_root;
-            if(!node)
+            SearchPath curr_step = SearchPath::start;
+            std::shared_ptr<NODE> current = tree_root;
+            while(curr_step != SearchPath::end)
             {
-                return false;
+                curr_step = calc_functor(current);
             }
-            while(node->key != key)
-            {
-                if(key > node->key)
-                {
-                    calc_functor(node, SEARCH_PATH::Right);
-                    if(node->right == nullptr)
-                    {
-                        return false;
-                    }
-                    node = node->right;
-                    continue;
-                }
-                else if(key < node->key)
-                {
-                    calc_functor(node, SEARCH_PATH::Left);
-                    if(node->left == nullptr)
-                    {
-                        return false;
-                    }
-                    node = node->left;
-                    continue;
-                }
-            }
-            // If we reached this point, node now points to the correct address.
-            calc_functor(node, SEARCH_PATH::End);
-            return true;
+            return current;
         }
     };
 }

@@ -15,6 +15,7 @@ namespace DS
     template<typename RANK, typename KEY_TYPE=int, typename VAL_TYPE=int, class NODE=graph_node<KEY_TYPE, VAL_TYPE>> 
     class RankAVL : public AVL<KEY_TYPE, VAL_TYPE, NODE>
     {
+        typedef AVL<KEY_TYPE, VAL_TYPE, NODE> Avl;
     private:
         /*********************************/
         /*        Private Section        */
@@ -40,8 +41,8 @@ namespace DS
             }
 
             // Update the new heights:
-            sub_root->height = max(height(sub_root->left), height(sub_root->right)) + 1;
-            L_sub->height = max(height(L_sub->left), height(L_sub->right)) + 1;
+            sub_root->height = Avl::max(Avl::height(sub_root->left), Avl::height(sub_root->right)) + 1;
+            L_sub->height = Avl::max(Avl::height(L_sub->left), Avl::height(L_sub->right)) + 1;
 
             // Update ranks:
             rankUpdate(sub_root);
@@ -69,8 +70,8 @@ namespace DS
             }
 
             // Update the new heights:
-            sub_root->height = max(height(sub_root->left), height(sub_root->right)) + 1;
-            R_sub->height = max(height(R_sub->left), height(R_sub->right)) + 1;
+            sub_root->height = Avl::max(Avl::height(sub_root->left), Avl::height(sub_root->right)) + 1;
+            R_sub->height = Avl::max(Avl::height(R_sub->left), Avl::height(R_sub->right)) + 1;
 
             // Update ranks:
             rankUpdate(sub_root);
@@ -88,11 +89,11 @@ namespace DS
             {
                 if(root->left == nullptr)
                 {
-                    root->left = newNode(key, val, root);
-                    root->height = max(height(root->left), height(root->right)) + 1;
+                    root->left = Avl::newNode(key, val, root);
+                    root->height = Avl::max(Avl::height(root->left), Avl::height(root->right)) + 1;
                     rankUpdate(root->left); // Update ranks
                     rankUpdate(root);
-                    node_count++;
+                    Avl::node_count++;
                     return root;
                 }
                 root->left = insertAux(key, val, root->left);
@@ -101,11 +102,11 @@ namespace DS
             {
                 if(root->right == nullptr)
                 {
-                    root->right = newNode(key, val, root);
-                    root->height = max(height(root->left), height(root->right)) + 1;
+                    root->right = Avl::newNode(key, val, root);
+                    root->height = Avl::max(Avl::height(root->left), Avl::height(root->right)) + 1;
                     rankUpdate(root->right); // Update ranks
                     rankUpdate(root);
-                    node_count++;
+                    Avl::node_count++;
                     return root;
                 }
                 root->right = insertAux(key, val, root->right);
@@ -117,11 +118,11 @@ namespace DS
             }
 
             // 2. Update the height and ranks of all the nodes in the BST search.
-            root->height = max(height(root->left), height(root->right)) + 1;
+            root->height = Avl::max(Avl::height(root->left), Avl::height(root->right)) + 1;
             rankUpdate(root);
 
             // 3. Verify balance factors, and perform rotations if needed.
-            int balance_fact = getBalance(root);
+            int balance_fact = Avl::getBalance(root);
             // RR Rotation:
             if((balance_fact < -1) && (root->right->key < key))
             {
@@ -175,7 +176,7 @@ namespace DS
                     if (child==nullptr)
                     {
                         root = nullptr;
-                        node_count--; // Decrement the count of nodes in the tree
+                        Avl::node_count--; // Decrement the count of nodes in the tree
                     }
                     // Only one child
                     else
@@ -191,14 +192,14 @@ namespace DS
                         {
                             child->left->father = root;
                         }
-                        node_count--; // Decrement the count of nodes in the tree
+                        AVL<KEY_TYPE, VAL_TYPE, NODE>::node_count--; // Decrement the count of nodes in the tree
                     }
                 }
                 // Two children
                 else
                 {
                     // Find the root's replacement node:
-                    std::shared_ptr<NODE> nextMin = findLowestNode(root->right);
+                    std::shared_ptr<NODE> nextMin = Avl::findLowestNode(root->right);
                     // Backup the pointers of root before we override them
                     std::shared_ptr<NODE> rootOldLeftChild = root->left;
                     std::shared_ptr<NODE> rootOldRightChild = root->right;
@@ -217,14 +218,14 @@ namespace DS
                 return root;
             }
             // Update heights and ranks:
-            root->height = max(height(root->right), height(root->left)) + 1;
+            root->height = Avl::max(Avl::height(root->right), Avl::height(root->left)) + 1;
             rankUpdate(root);
             // Confirm balance factors:
-            int balance_fact = getBalance(root);
+            int balance_fact = Avl::getBalance(root);
             // If the node is unbalanced then we need two rotations according to the 4 cases:
             if (balance_fact > 1)
             {
-                if (getBalance(root->left) >= 0) // LL rotation
+                if (Avl::getBalance(root->left) >= 0) // LL rotation
                 {
                     return rotateRight(root);
                 }
@@ -236,7 +237,7 @@ namespace DS
             }
             if (balance_fact < -1)
             {
-                if (getBalance(root->right) <= 0)  //RR rotation
+                if (Avl::getBalance(root->right) <= 0)  //RR rotation
                 {
                     return rotateLeft(root);
                 }
@@ -264,12 +265,12 @@ namespace DS
          * Possible Exceptions:
          * std::bad_alloc
          */
-        explicit RankAVL(const NODE& root, RANK func) : AVL(root), rankUpdate(func) { }
-        explicit RankAVL(RANK func) : AVL(), rankUpdate(func) { }
+        explicit RankAVL(const NODE& root, RANK func) : Avl::AVL(root), Avl::rankUpdate(func) { }
+        explicit RankAVL(RANK func) : Avl::AVL(), rankUpdate(func) { }
 
         RankAVL(const AVL<KEY_TYPE, VAL_TYPE,NODE>& other) = delete;
-        RankAVL& operator=(const AVL& other) = delete;
-        virtual ~RankAVL();
+        RankAVL& operator=(const RankAVL& other) = delete;
+        virtual ~RankAVL() = default;
 
         /*
          * Method: insert
@@ -284,25 +285,25 @@ namespace DS
          */
         void insert(const KEY_TYPE& key, const VAL_TYPE& val) override
         {
-            if(tree_root == nullptr)
+            if(Avl::tree_root == nullptr)
             {
-                tree_root = newNode(key, val);
-                updateRank(tree_root); // Update rank
-                leftmost_node = rightmost_node = tree_root;
-                node_count++;
+                Avl::tree_root = Avl::newNode(key, val);
+                rankUpdate(Avl::tree_root); // Update rank
+                Avl::leftmost_node = Avl::rightmost_node = Avl::tree_root;
+                Avl::node_count++;
                 return;
             }
-            tree_root = insertAux(key, val, tree_root);
+            Avl::tree_root = insertAux(key, val, Avl::tree_root);
             
-            assert(leftmost_node);
-            assert(rightmost_node);
-            if(key < leftmost_node->key)
+            assert(Avl::leftmost_node);
+            assert(Avl::rightmost_node);
+            if(key < Avl::leftmost_node->key)
             {
-                leftmost_node = findLowestNode(tree_root);
+                Avl::leftmost_node = Avl::findLowestNode(Avl::tree_root);
             }
-            if(key > rightmost_node->key)
+            if(key > Avl::rightmost_node->key)
             {
-                rightmost_node = findHighestNode(tree_root);
+                Avl::rightmost_node = Avl::findHighestNode(Avl::tree_root);
             }
         }
 
@@ -316,24 +317,24 @@ namespace DS
          */
         void erase(const KEY_TYPE& key) override
         {
-            tree_root = eraseAux(tree_root, key);
-            if(tree_root)
+            Avl::tree_root = eraseAux(Avl::tree_root, key);
+            if(Avl::tree_root)
             {
-                assert(leftmost_node);
-                assert(rightmost_node);
-                if(key == leftmost_node->key)
+                assert(Avl::leftmost_node);
+                assert(Avl::rightmost_node);
+                if(key == Avl::leftmost_node->key)
                 {
-                    leftmost_node = findLowestNode(tree_root);
+                    Avl::leftmost_node = Avl::findLowestNode(Avl::tree_root);
                 }
-                if(key == rightmost_node->key)
+                if(key == Avl::rightmost_node->key)
                 {
-                    rightmost_node = findHighestNode(tree_root);
+                    Avl::rightmost_node = Avl::findHighestNode(Avl::tree_root);
                 }
             }
             else
             {
-                leftmost_node = nullptr;
-                rightmost_node = nullptr;
+                Avl::leftmost_node = nullptr;
+                Avl::rightmost_node = nullptr;
             }
         }
 
@@ -351,10 +352,10 @@ namespace DS
          * worst time and space complexity for this method is O(log n).
          */
         template<class FUNCTOR>
-        std::shared_ptr<NODE>& rank(FUNCTOR calc_functor)
+        std::shared_ptr<NODE> rank(FUNCTOR calc_functor) const
         {
             SearchPath curr_step = SearchPath::start;
-            std::shared_ptr<NODE> current = tree_root;
+            std::shared_ptr<NODE> current = Avl::tree_root;
             while(curr_step != SearchPath::end)
             {
                 curr_step = calc_functor(current);

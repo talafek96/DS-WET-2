@@ -90,7 +90,7 @@ namespace DS
 
         /*   Class Private Methods   */
         // General right and left rotations for balanced trees, return the new root of the tree.
-        std::shared_ptr<NODE> rotateRight(std::shared_ptr<NODE>& sub_root)
+        virtual std::shared_ptr<NODE> rotateRight(std::shared_ptr<NODE>& sub_root)
         {
             std::shared_ptr<NODE> father = sub_root->father;
             std::shared_ptr<NODE> L_sub = sub_root->left;
@@ -115,7 +115,7 @@ namespace DS
         }
 
 
-        std::shared_ptr<NODE> rotateLeft(std::shared_ptr<NODE>& sub_root)
+        virtual std::shared_ptr<NODE> rotateLeft(std::shared_ptr<NODE>& sub_root)
         {
             std::shared_ptr<NODE> father = sub_root->father;
             std::shared_ptr<NODE> R_sub = sub_root->right;
@@ -140,7 +140,7 @@ namespace DS
         }
 
         // An auxiliary insert method for the class' use.
-        std::shared_ptr<NODE> insertAux(const KEY_TYPE& key, const VAL_TYPE& val, std::shared_ptr<NODE>& root)
+        virtual std::shared_ptr<NODE> insertAux(const KEY_TYPE& key, const VAL_TYPE& val, std::shared_ptr<NODE>& root)
         {
             assert(root != nullptr);
             // 1. Do a normal BST rotation:
@@ -225,7 +225,7 @@ namespace DS
         }
 
         // An auxiliary eraese method for the class' use.
-        std::shared_ptr<NODE> eraseAux(std::shared_ptr<NODE>& root, const KEY_TYPE& key)
+        virtual std::shared_ptr<NODE> eraseAux(std::shared_ptr<NODE>& root, const KEY_TYPE& key)
         {
             // Search the node in BST
             if (root == nullptr)
@@ -477,7 +477,7 @@ namespace DS
          * Possible Exceptions:
          * std::bad_alloc
          */
-        void insert(const KEY_TYPE& key, const VAL_TYPE& val)
+        virtual void insert(const KEY_TYPE& key, const VAL_TYPE& val)
         {
             if(tree_root == nullptr)
             {
@@ -508,7 +508,7 @@ namespace DS
          * When n is the total number of keys in the tree, the
          * worst time and space complexity for this method is O(log n).
          */
-        void erase(const KEY_TYPE& key)
+        virtual void erase(const KEY_TYPE& key)
         {
             tree_root = eraseAux(tree_root, key);
             if(tree_root)

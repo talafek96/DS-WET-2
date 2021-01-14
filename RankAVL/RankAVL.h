@@ -322,14 +322,8 @@ namespace DS
             {
                 assert(Avl::leftmost_node);
                 assert(Avl::rightmost_node);
-                if(key == Avl::leftmost_node->key)
-                {
-                    Avl::leftmost_node = Avl::findLowestNode(Avl::tree_root);
-                }
-                if(key == Avl::rightmost_node->key)
-                {
-                    Avl::rightmost_node = Avl::findHighestNode(Avl::tree_root);
-                }
+                Avl::leftmost_node = Avl::findLowestNode(Avl::tree_root);
+                Avl::rightmost_node = Avl::findHighestNode(Avl::tree_root);
             }
             else
             {

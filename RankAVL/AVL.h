@@ -515,14 +515,8 @@ namespace DS
             {
                 assert(leftmost_node);
                 assert(rightmost_node);
-                if(key == leftmost_node->key)
-                {
-                    leftmost_node = findLowestNode(tree_root);
-                }
-                if(key == rightmost_node->key)
-                {
-                    rightmost_node = findHighestNode(tree_root);
-                }
+                leftmost_node = findLowestNode(tree_root);
+                rightmost_node = findHighestNode(tree_root);
             }
             else
             {

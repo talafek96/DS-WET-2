@@ -1,5 +1,6 @@
 #ifndef _DYNAMIC_ARRAY_H
 #define _DYNAMIC_ARRAY_H
+#include <cassert>
 #include "Array.h"
 #include "../Exceptions/Exceptions.h"
 
@@ -82,6 +83,7 @@ namespace DS
         // Return a bool value to determine whether the dynamic array at index i is initialized.
         bool isInitialized(int i) const noexcept
         {
+            assert(i >= 0);
             return ((i < max_size) && (B[i] < top) && (B[i] >= 0) && (index_stack[B[i]] == i));
         }
 

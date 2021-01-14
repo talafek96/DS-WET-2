@@ -100,7 +100,6 @@ namespace DS
         int lecture_counter = 0;
 
     public:
-        // TODO: Make a constructor
         Boom2();
         ~Boom2() = default;
 
